@@ -1,9 +1,5 @@
-// pub mod compress;
-// use compress::huffman;
-
-mod image;
-
-use image::Image;
+mod compress;
+use compress::jpeg;
 
 extern crate clap;
 use clap::{App, Arg};
