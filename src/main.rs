@@ -31,12 +31,12 @@ fn main(){
  
     if let Some(file) = matches.value_of("compress"){
         let byte_stream: Vec<u8> = get_file_as_byte_vec(&file.to_string());
-        println!("{:?}",byte_stream);
-        // let compressed_data = huffman::compress(&byte_stream);
-
+        // println!("{:?}",byte_stream);
+        let my_color = jpeg::vec8_to_color(&byte_stream);
+        println!("{:?}", &my_color);
 
         // let output_file = file.to_string() + ".cmp";
         // let error_msg = "Error writing file: ".to_string();
-	// fs::write(output_file, compressed_data).expect(&error_msg);
+    	// fs::write(output_file, compressed_data).expect(&error_msg);
     }
 }
