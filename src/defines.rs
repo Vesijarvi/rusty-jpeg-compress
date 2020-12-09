@@ -1,8 +1,7 @@
+pub const HEIGHT:usize = 256;
+pub const WIDTH:usize = 256;
+
 #[derive(Debug, Clone, Copy)]
-
-const HEIGHT:usize = 256;
-const WIDTH:usize = 256;
-
 pub struct Color {
     pub r: u8,
     pub g: u8,
@@ -35,6 +34,6 @@ impl Image {
 pub type Block = [[f32; 8]; 8];
 
 /* Minimum Coded Unit */
-pub type MCU = [Vec<Vec<Block>>; 3]
+pub type MCU = [Vec<Vec<Block>>;];
 
 

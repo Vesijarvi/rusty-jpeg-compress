@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use crate define::*;
+use crate::defines::*;
 
 // // Transfer byte stream to Color 
 //     pub fn vec8_to_color(stream_vec: &Vec<u8>) -> Vec<Color> {
@@ -31,6 +31,19 @@ use crate define::*;
 //         let mut image = Vec
 //     }
 
-fn read_to_mcus(stream_vec: Vec<u8>) -> Vec<Vec<MCU>> {
+// for grayscale pictures
+pub fn read_to_mcus(stream_vec: &Vec<u8>) -> Vec<Vec<MCU>> {
+    // 256*256 image 
+    let w = WIDTH / 8;
+    let h = HEIGHT / 8;
+    println!("Image with width: {}, height: {}.", w,h);
 
+    let mut _stream_vec = *stream_vec;
+    let mut MCUs = vec![vec!{Default::default(); w as usize}; h as usize];
+    for i in 0..h {
+        for j in 0..w {
+            MCUs[i as usize][j as usize] = stream_vec.pop().unwrap();
+        }
+    }
+    return MCUs;
 }

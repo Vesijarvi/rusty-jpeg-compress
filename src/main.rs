@@ -1,5 +1,10 @@
 mod compress;
+mod reader;
+mod defines;
+
 use compress::jpeg;
+use reader::*;
+use defines::*;
 
 extern crate clap;
 use clap::{App, Arg};
@@ -32,8 +37,8 @@ fn main(){
     if let Some(file) = matches.value_of("compress"){
         let byte_stream: Vec<u8> = get_file_as_byte_vec(&file.to_string());
         // println!("{:?}",byte_stream);
-        let my_color = jpeg::vec8_to_color(&byte_stream);
-        println!("{:?}", &my_color);
+        let my_MCUs = reader::read_to_mcus(&byte_stream);
+        // println!("{:?}", &my_color);
 
         // let output_file = file.to_string() + ".cmp";
         // let error_msg = "Error writing file: ".to_string();
