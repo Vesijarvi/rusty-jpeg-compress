@@ -1,4 +1,9 @@
 #![allow(non_snake_case)]
+
+// Read steps
+// [v] 1. Get in u8 string 
+// [v] 2. Convert into YCbCr
+// [ ] 3. Blockize 
 pub mod jpeg {
     
     pub const HEIGHT:usize = 256;
@@ -8,7 +13,8 @@ pub mod jpeg {
     
     /* Minimum Coded Unit */
     pub type MCU = [Vec<Vec<Block>>; 3];
-     #[derive(Debug, Clone, Copy)]
+
+    #[derive(Debug, Clone, Copy)]
     pub struct Color {
         pub Y: f32,
         pub Cb: f32,
@@ -22,7 +28,7 @@ pub mod jpeg {
     }
     
     // Transfer byte stream to Color 
-    pub fn vec8_to_color(stream_vec: &Vec<u8>) -> Vec<Color> {
+    fn vec8_to_color(stream_vec: &Vec<u8>) -> Vec<Color> {
         let mut color_vec = Vec::new();
 
         let mut r = 0;
@@ -46,9 +52,25 @@ pub mod jpeg {
                 _ => { panic!("Parse error in Color"); }
             }
             cnt = (cnt + 1) % 3;
-            full_cnt += 1;
         }
         color_vec
+    }
+    // into three plane
+    fn to_three_plane(color_vec: Vec<Color>) {
+        let mut Y_plane = Vec::new();
+        let mut Cb_plane = Vec::new();
+        let mut Cr_plane = Vec::new();
+
+        for f in color_vec {
+            let y:f32 = f.Y;
+            let cb:f32 = f.Cb;
+            let cr:f32 = f.Cr; 
+            Y_plane.push(y);
+            Cb_plane.push(cb);
+            Cr_plane.push(cr);
+        }
+
+
     }
     pub fn compress(stream_vec: &Vec<u8>) {
         let myColor = vec8_to_color(&stream_vec);
