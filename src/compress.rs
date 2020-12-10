@@ -5,15 +5,13 @@
 // [v] 2. Convert into YCbCr
 // [ ] 3. Blockize 
 pub mod jpeg {
-    
+    use std::default::Default;
+
     pub const HEIGHT:usize = 256;
     pub const WIDTH:usize = 256;
-    
+
     pub type Block = [[f32; 8]; 8];
     
-    /* Minimum Coded Unit */
-    pub type MCU = [Vec<Vec<Block>>; 3];
-
     #[derive(Debug, Clone, Copy)]
     pub struct Color {
         pub Y: f32,
@@ -26,9 +24,22 @@ pub mod jpeg {
             return Color {Y, Cb, Cr};
         }
     }
+
+    // zigzag block order
+    const ZZ: [[usize; 8]; 8] = [
+        [ 0,  1,  5,  6, 14, 15, 27, 28 ],
+        [ 2,  4,  7, 13, 16, 26, 29, 42 ],
+        [ 3,  8, 12, 17, 25, 30, 41, 43 ],
+        [ 9, 11, 18, 24, 31, 40, 44, 53 ],
+        [ 10, 19, 23, 32, 39, 45, 52, 54 ],
+        [ 20, 22, 33, 38, 46, 51, 55, 60 ],
+        [ 21, 34, 37, 47, 50, 56, 59, 61 ],
+        [ 35, 36, 48, 49, 57, 58, 62, 63 ]
+    ];
+
     
     // Transfer byte stream to Color 
-    fn vec8_to_color(stream_vec: &Vec<u8>) -> Vec<Color> {
+    fn read_vec8_to_color(stream_vec: &Vec<u8>) -> Vec<Color> {
         let mut color_vec = Vec::new();
 
         let mut r = 0;
@@ -55,8 +66,9 @@ pub mod jpeg {
         }
         color_vec
     }
-    // into three plane
-    fn to_three_plane(color_vec: Vec<Color>) {
+
+    fn read_color_to_mcus(color_vec: Vec<Color>) -> Vec<Vec<Block>>  {
+        // still can make improvement to simplify code
         let mut Y_plane = Vec::new();
         let mut Cb_plane = Vec::new();
         let mut Cr_plane = Vec::new();
@@ -69,12 +81,29 @@ pub mod jpeg {
             Cb_plane.push(cb);
             Cr_plane.push(cr);
         }
-
-
+        let mut bitplanes: Vec<Vec<Block>> = vec![vec![Default::default(); 64]; 3];
+    
+        for y in 0..256 {
+            for x in 0..256 {
+                bitplanes[0][(x / 8) + 4 * (y / 8)][x % 8][y % 8] = Y_plane[x + 256 * y];
+            }
+        }
+        for y in 0..256 {
+            for x in 0..256 {
+                bitplanes[1][(x / 8) + 4 * (y / 8)][x % 8][y % 8] = Y_plane[x + 256 * y];
+            }
+        }
+        for y in 0..256 {
+            for x in 0..256 {
+                bitplanes[2][(x / 8) + 4 * (y / 8)][x % 8][y % 8] = Y_plane[x + 256 * y];
+            }
+        }
+        bitplanes
     }
     pub fn compress(stream_vec: &Vec<u8>) {
-        let myColor = vec8_to_color(&stream_vec);
+        let colorYCbCr = read_vec8_to_color(&stream_vec);
         // println!("{:?}",myColor);
+        let my_mcus = read_color_to_mcus(&colorYCbCr);
         
     }
 }

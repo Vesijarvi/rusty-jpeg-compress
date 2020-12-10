@@ -1,10 +1,6 @@
 mod compress;
-mod reader;
-mod defines;
 
 use compress::jpeg::*;
-use reader::*;
-use defines::*;
 
 extern crate clap;
 use clap::{App, Arg};
