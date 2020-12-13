@@ -5,10 +5,12 @@
 // [v] 2. Convert into YCbCr
 // [v] 3. Blockize 
 // [ ] 4. DCT
-// [ ] 5. quantilize
-// [ ]
+// [ ] 5. Zigzag
+// [ ] 6. quantilize
+// [ ] 7. Add necessary headers
 pub mod jpeg {
     use std::default::Default;
+    use std::f32::consts::PI;
 
     pub const HEIGHT:usize = 256;
     pub const WIDTH:usize = 256;
@@ -28,6 +30,15 @@ pub mod jpeg {
         }
     }
 
+    fn cc(i: usize, j: usize) -> f32 {
+        if i == 0 && j == 0 {
+            return 1.0/2.0;
+        } else if i == 0 || j == 0 {
+            return 1.0 / (2.0 as f32).sqrt();
+        } else {
+            return 1.0;
+        }
+    }
     // zigzag block order
     const ZZ: [[usize; 8]; 8] = [
         [ 0,  1,  5,  6, 14, 15, 27, 28 ],
@@ -67,6 +78,7 @@ pub mod jpeg {
         color_vec
     }
 
+    // mcu[id][block][h][w]
     fn read_color_to_mcus(color_vec: &Vec<Color>) -> Vec<Vec<Block>>  {
         // still can make improvement to simplify code
         // lets just leave it for now
@@ -101,10 +113,29 @@ pub mod jpeg {
         }
         bitplanes
     }
-    /*
-    fn dct(in_mcus: &Vec<Vec<Block>>) -> Vec<Vec<Block>> {
-
-    }*/
+    
+    fn dct(in_mcu: &mut Vec<Vec<Block>>) -> Vec<Vec<Block>> {
+        for id in 0..3 {
+            for nblock in 0..64 {
+                let mut tmp: [[f32; 8]; 8] = Default::default();
+                for i in 0..8 {
+                    for j in 0..8 {
+                        for x in 0..8 {
+                            for y in 0..8 {
+                                // inverse discrete cosine trasform
+                                let i_cos = ((2*i+1) as f32 * PI / 16.0 * x as f32).cos();
+                                let j_cos =((2*j+1) as f32 * PI / 16.0 * y as f32).cos();
+                                tmp[i][j] += cc(x, y) * in_mcu[id][nblock][x][y] * i_cos * j_cos;
+                            }
+                        }
+                        tmp[i][j] /= 4.0;
+                    }
+                in_mcu[id][nblock] = tmp;
+                }
+            }
+        }
+        in_mcu.to_vec()
+    }
     pub fn compress(stream_vec: &Vec<u8>) {
         let colorYCbCr = read_vec8_to_color(&stream_vec);
         // println!("{:?}",myColor);
