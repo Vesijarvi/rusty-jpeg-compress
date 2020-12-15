@@ -2,8 +2,9 @@
 
 ## About 
 
-The program is for educational jpeg compress, 
-written for Data Compression Couse 2020, National Central Univesity, Taiwan
+The program is for educational jpeg compress. 
+  
+Written for Data Compression Couse 2020, National Central Univesity, Taiwan
 
 ## How to run code 
 
