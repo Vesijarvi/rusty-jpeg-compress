@@ -1,13 +1,5 @@
 #![allow(non_snake_case)]
 
-// Read steps
-// [v] 1. Get in u8 string 
-// [v] 2. Convert into YCbCr
-// [v] 3. Blockize 
-// [ ] 4. DCT
-// [ ] 5. Zigzag
-// [ ] 6. quantilize
-// [ ] 7. Add necessary headers
 pub mod jpeg {
     use std::default::Default;
     use std::f32::consts::PI;
@@ -94,21 +86,23 @@ pub mod jpeg {
             Cb_plane.push(cb);
             Cr_plane.push(cr);
         }
-        let mut bitplanes: Vec<Vec<Block>> = vec![vec![Default::default(); 64]; 3];
+        let mut bitplanes: Vec<Vec<Block>> = vec![vec![Default::default(); 1024]; 3];
     
+        // split bitplanes into block
         for y in 0..256 {
             for x in 0..256 {
-                bitplanes[0][(x / 8) + 4 * (y / 8)][x % 8][y % 8] = Y_plane[x + 256 * y];
+                //println!("x={}, y={}, x/7={}, y/7={}, x%7={}, y%7={}, index{}",x,y,x/8,y/8,x%8,y%8,x/8 + 32*(y/8));
+                bitplanes[0][(x / 8) + 32 * (y / 8)][x % 8][y % 8]  = Y_plane[x + 256 * y];
             }
         }
         for y in 0..256 {
             for x in 0..256 {
-                bitplanes[1][(x / 8) + 4 * (y / 8)][x % 8][y % 8] = Cb_plane[x + 256 * y];
+                bitplanes[1][(x / 8) + 32 * (y / 8)][x % 8][y % 8]  = Cb_plane[x + 256 * y];
             }
         }
         for y in 0..256 {
             for x in 0..256 {
-                bitplanes[2][(x / 8) + 4 * (y / 8)][x % 8][y % 8] = Cr_plane[x + 256 * y];
+                bitplanes[2][(x / 8) + 32 * (y / 8)][x % 8][y % 8] = Cr_plane[x + 256 * y];
             }
         }
         bitplanes
@@ -116,7 +110,7 @@ pub mod jpeg {
     
     fn dct(in_mcu: &mut Vec<Vec<Block>>) -> Vec<Vec<Block>> {
         for id in 0..3 {
-            for nblock in 0..64 {
+            for nblock in 0..1024 {
                 let mut tmp: [[f32; 8]; 8] = Default::default();
                 for i in 0..8 {
                     for j in 0..8 {
@@ -136,10 +130,47 @@ pub mod jpeg {
         }
         in_mcu.to_vec()
     }
+    fn zigzag(in_mcu: &mut Vec<Vec<Block>>) -> Vec<Vec<Block>> {
+        for id in 0..3 {
+            for block in 0..1024 {
+                let mut tmp: Block = Default::default();
+                for i in 0..8 {
+                    for j in 0..8 {
+                        let pos = ZZ[i][j];
+                        tmp[i][j] = in_mcu[id][block][pos/8][pos%8];
+                    }
+                }
+                //println!("{:?}",tmp);
+                in_mcu[id][block] = tmp;
+            }
+        }
+        in_mcu.to_vec()
+    }
+    fn quantilize() {
+
+    }
+    // show Vec<Vec<block>>
+    fn display(in_mcu: &Vec<Vec<Block>>) {
+        let m = ["Y", "Cb", "Cr"];
+        for id in 0..3 {
+            for nblock in 0..1024{
+                println!("------- {} 顏色分量 {} -------", m[id], nblock);
+                let block = in_mcu[id][nblock];
+                for i in 0..8 {
+                    for j in 0..8 {
+                        print!("{:.3} ", block[i][j]);
+                    }
+                    println!("");
+                }
+            }
+        }
+    }
     pub fn compress(stream_vec: &Vec<u8>) {
         let colorYCbCr = read_vec8_to_color(&stream_vec);
-        // println!("{:?}",myColor);
-        let my_mcus = read_color_to_mcus(&colorYCbCr);
-        
+        let mut my_mcus = read_color_to_mcus(&colorYCbCr);
+        let mut after_DCT = dct(&mut my_mcus);
+        // display(&after_DCT);
+        let after_ZZ = zigzag(&mut after_DCT);
+        display(&after_ZZ);
     }
 }
