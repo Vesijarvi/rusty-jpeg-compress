@@ -2,7 +2,15 @@
 
 ## About 
 
-The program is for educational jpeg compress
+The program is for educational jpeg compress, 
+written for Data Compression Couse 2020, National Central Univesity, Taiwan
+
+## How to run code 
+
+```
+$ cargo run -- -c your-raw-file.raw
+```
+
 
 ## Total steps for implementation 
 - [x] 1. Get in u8 string 
