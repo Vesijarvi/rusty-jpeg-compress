@@ -13,11 +13,11 @@ $ cargo run -- -c your-raw-file.raw
 
 
 ## Total steps for implementation 
-- [x] 1. Get in u8 string 
+- [x] 1. Read file in as u8 vector streaem 
 - [x] 2. Convert into YCbCr
 - [x] 3. Blockize 
 - [x] 4. DCT
 - [x] 5. Zigzag
-- [ ] 6. quantilization
+- [ ] 6. Quantilization
 - [ ] 7. Entropy coding Huffman
 - [ ] 8. Add necessary header
