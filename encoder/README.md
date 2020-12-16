@@ -1,4 +1,4 @@
-# rusty-jpeg-compress
+# rusty-jpeg-compress/encoder
 
 ## About 
 
@@ -11,7 +11,6 @@ Written for Data Compression Couse 2020, National Central Univesity, Taiwan
 ```
 $ cargo run -- -c your-raw-file.raw
 ```
-
 
 ## Total steps for implementation 
 - [x] 1. Read file in as u8 vector streaem 
