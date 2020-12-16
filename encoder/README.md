@@ -17,7 +17,9 @@ $ cargo run -- -c your-raw-file.raw
 - [x] 2. Convert u8 into YCbCr structure
 - [x] 3. Blockize to MCUs
 - [x] 4. DCT
-- [x] 5. Zigzag
-- [ ] 6. Quantilization
+- [x] 5. Quantilization
+- [x] 6. Zigzag
 - [ ] 7. Entropy coding Huffman
 - [ ] 8. Add necessary header
+
+
