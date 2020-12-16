@@ -31,7 +31,7 @@ pub mod jpeg {
             return 1.0;
         }
     }
-    // zigzag block order
+    // zigzag block order 
     const ZZ: [[usize; 8]; 8] = [
         [ 0,  1,  5,  6, 14, 15, 27, 28 ],
         [ 2,  4,  7, 13, 16, 26, 29, 42 ],
@@ -42,8 +42,8 @@ pub mod jpeg {
         [ 21, 34, 37, 47, 50, 56, 59, 61 ],
         [ 35, 36, 48, 49, 57, 58, 62, 63 ]
     ];
-    // quantize table
-    const QTable: [[usize; 8]; 8] = [
+    // quantize table QF = 50
+    const QTABLE: [[usize; 8]; 8] = [
         [ 16, 11, 10, 16, 24, 40, 51, 61],
         [ 12, 12, 14, 19, 26, 58, 60, 55],
         [ 14, 13, 16, 24, 40, 57, 69, 56],
@@ -157,8 +157,18 @@ pub mod jpeg {
         }
         in_mcu.to_vec()
     }
-    fn quantilize() {
-
+    fn quantilize(in_mcu: &mut Vec<Vec<Block>>) -> Vec<Vec<Block>> {
+        for id in 0..3 {
+            for block in 0..1024 {
+                for i in 0..8 {
+                    for j in 0..8 {
+                        let tmp:f32 = in_mcu[id][block][i][j] / (QTABLE[i][j] as f32);
+                        in_mcu[id][block][i][j] = tmp;
+                    }
+                }
+            }
+        }
+        in_mcu.to_vec()
     }
     // show Vec<Vec<block>>
     fn display(in_mcu: &Vec<Vec<Block>>) {
@@ -181,7 +191,8 @@ pub mod jpeg {
         let mut my_mcus = read_color_to_mcus(&colorYCbCr);
         let mut after_DCT = dct(&mut my_mcus);
         // display(&after_DCT);
-        let after_ZZ = zigzag(&mut after_DCT);
+        let mut quantilized = quantilize(&mut after_DCT);
+        let after_ZZ = zigzag(&mut quantilized);
         display(&after_ZZ);
     }
 }
