@@ -2,7 +2,7 @@
 
 ## About 
 
-The program is for educational jpeg compress. 
+The program is for educational jpeg compress and decompress.
   
 Written for Data Compression Couse 2020, 
 National Central Univesity, Taiwan
